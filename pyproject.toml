@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "password-manager-cli"
+version = "0.1.0"
+description = "Encrypted command-line password manager"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["cryptography"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+pwm = "password_manager.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
