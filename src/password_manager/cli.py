@@ -162,7 +162,6 @@ def cmd_generate(args: argparse.Namespace) -> int:
 
 #  argument parsing
 
-
 def build_parser() -> argparse.ArgumentParser:
     """Build the argparse parser for every subcommand"""
     parser = argparse.ArgumentParser(
@@ -226,6 +225,9 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\nAborted.", file=sys.stderr)
         return 130
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
