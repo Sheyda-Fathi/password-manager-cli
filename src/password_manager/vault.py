@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .crypto import CryptoService, generate_salt
 from .exceptions import (
+    CorruptedVaultError,
     DuplicateEntryError,
     EntryNotFoundError,
     InvalidMasterPasswordError,
@@ -66,28 +67,34 @@ class Vault:
 
     @classmethod
     def open(cls, path: Path, master_password: str) -> "Vault":
-        """Open an existing vault and decrypt its entries"""
+        """Open an existing vault and decrypt its entries """
         storage = JSONStorage(path)
         data = storage.load()
 
-        salt = base64.urlsafe_b64decode(data["salt"].encode("ascii"))
+        try:
+            salt = base64.urlsafe_b64decode(data["salt"].encode("ascii"))
+            check_token = data["check"]
+            raw_entries = data["entries"]
+        except (KeyError, TypeError, ValueError) as e:
+            raise CorruptedVaultError("vault file is missing required fields") from e
+
         crypto = CryptoService(master_password, salt)
 
-        try:
-            if crypto.decrypt(data["check"]) != CHECK_VALUE:
-                raise InvalidMasterPasswordError()
-        except InvalidMasterPasswordError:
-            raise
-        except Exception as e:
-            raise InvalidMasterPasswordError() from e
+        if crypto.decrypt(check_token) != CHECK_VALUE:
+            raise InvalidMasterPasswordError()
 
         vault = cls(path, crypto, salt)
-        for entry_data in data["entries"]:
-            entry_data = dict(entry_data)
-            entry_data["password"] = crypto.decrypt(entry_data["password"])
-            if entry_data.get("notes") is not None:
-                entry_data["notes"] = crypto.decrypt(entry_data["notes"])
-            entry = Entry.from_dict(entry_data)
+        for entry_data in raw_entries:
+            try:
+                entry_data = dict(entry_data)
+                entry_data["password"] = crypto.decrypt(entry_data["password"])
+                if entry_data.get("notes") is not None:
+                    entry_data["notes"] = crypto.decrypt(entry_data["notes"])
+                entry = Entry.from_dict(entry_data)
+            except InvalidMasterPasswordError:
+                raise
+            except (KeyError, TypeError, ValueError) as e:
+                raise CorruptedVaultError("a vault entry is malformed") from e
             vault._entries[entry.site] = entry
 
         vault._unlocked = True
@@ -137,7 +144,7 @@ class Vault:
 
     @require_unlocked
     def search(self, keyword: str) -> Iterator[Entry]:
-        """Yield entries whose site contains `keyword` (case-insensitive)."""
+        """Yield entries whose site contains `keyword` (case-insensitive)"""
         keyword_lower = keyword.lower()
         for entry in self._entries.values():
             if keyword_lower in entry.site.lower():

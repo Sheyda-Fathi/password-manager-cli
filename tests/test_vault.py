@@ -1,6 +1,10 @@
+import base64
+import json
+
 import pytest
 
 from password_manager.exceptions import (
+    CorruptedVaultError,
     DuplicateEntryError,
     EntryNotFoundError,
     InvalidMasterPasswordError,
@@ -40,6 +44,31 @@ def test_open_with_wrong_password_raises(tmp_path):
 
     with pytest.raises(InvalidMasterPasswordError):
         Vault.open(path, "wrong")
+
+
+def test_open_missing_salt_raises_corrupted(tmp_path):
+    """A valid-JSON file missing 'salt' should raise CorruptedVaultError, not KeyError"""
+    path = tmp_path / "test.vault"
+    path.write_text(json.dumps({"version": 1, "entries": []}), encoding="utf-8")
+
+    with pytest.raises(CorruptedVaultError):
+        Vault.open(path, "anypass")
+
+
+def test_open_malformed_entry_raises_corrupted(tmp_path):
+    """An entry missing 'password' should raise CorruptedVaultError, not KeyError"""
+    path = tmp_path / "test.vault"
+    v = Vault.init(path, "mypass")
+    v.add(Entry("github", "sheyda", "pw"))
+    v.save()
+    v.lock()
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    del data["entries"][0]["password"]
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    with pytest.raises(CorruptedVaultError):
+        Vault.open(path, "mypass")
 
 
 #   add / get
