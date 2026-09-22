@@ -26,7 +26,8 @@ class Entry:
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(site={self.site!r}, "
-            f"username={self.username!r}, password='****')")
+            f"username={self.username!r}, password='****')"
+        )
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to a JSON-friendly dict"""
@@ -42,9 +43,9 @@ class Entry:
     def from_dict(cls, data: dict[str, Any]) -> Self:
         """Build an Entry from a dict created by `to_dict`"""
         return cls(
-                    site=data["site"],
-                    username=data["username"],
-                    password=data["password"],
-                    notes=data.get("notes"),
-                    created_at=datetime.fromisoformat(data["created_at"]),
-                )
+            site=data["site"],
+            username=data["username"],
+            password=data["password"],
+            notes=data.get("notes"),
+            created_at=datetime.fromisoformat(data["created_at"]),
+        )

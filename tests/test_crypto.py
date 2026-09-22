@@ -51,4 +51,4 @@ def test_persian_password_and_text_roundtrip():
     """non-ascii (persian) master password and text should work correctly"""
     service = CryptoService("mymainpass", generate_salt())
     token = service.encrypt("hellooooo")
-    assert service.decrypt(token) ==  "hellooooo"
+    assert service.decrypt(token) == "hellooooo"
