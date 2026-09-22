@@ -28,3 +28,10 @@ class DuplicateEntryError(VaultError):
     def __init__(self, site: str) -> None:
         self.site = site
         super().__init__(f"entry for '{site}' already exists")
+
+class VaultNotFoundError(VaultError):
+    """when the vault file does not exist yet"""
+    
+    def __init__(self, path: str) -> None:
+        self.path = path
+        super().__init__(f"vault not found at '{path}'.")
