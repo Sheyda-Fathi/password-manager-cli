@@ -46,4 +46,5 @@ logs/
 # Project specific (vault files)
 *.vault
 *.vault.tmp
-vault.jsonREADME.pdf 
+vault.json
+README.pdf 
