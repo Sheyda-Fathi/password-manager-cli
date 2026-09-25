@@ -10,6 +10,7 @@ from .exceptions import VaultError
 from .generator import generate_password
 from .models import Entry
 from .vault import Vault
+from .strength import check_password_strength
 
 DEFAULT_VAULT_PATH = Path.home() / ".password_manager" / "vault.json"
 
@@ -51,11 +52,20 @@ def cmd_init(args: argparse.Namespace) -> int:
         print("Error: passwords do not match", file=sys.stderr)
         return 1
 
+    warnings = check_password_strength(password)
+    if warnings:
+        print("This master password has weaknesses:")
+        for warning in warnings:
+            print(f"  - {warning}")
+        answer = input("Continue with this password anyway? (y/n): ").strip().lower()
+        if not answer.startswith("y"):
+            print("Aborted. Vault was not created.")
+            return 1
+
     path.parent.mkdir(parents=True, exist_ok=True)
     Vault.init(path, password)
     print(f"Vault created at {path}")
     return 0
-
 
 def cmd_add(args: argparse.Namespace) -> int:
     """Add a new entry to the vault"""
