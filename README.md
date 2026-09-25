@@ -28,7 +28,7 @@ Most "password manager" tutorials either skip encryption entirely or roll their 
 - **Python 3.11+**
 - [`cryptography`](https://cryptography.io/) — PBKDF2-HMAC-SHA256 key derivation + Fernet (AES-128-CBC + HMAC) encryption
 - `argparse`, `pyperclip` — CLI parsing
-- `pytest` — 65 tests, all vault/crypto/storage/CLI logic covered
+- `pytest` — 71 tests, all vault/crypto/storage/CLI logic covered
 - `dataclasses`, `secrets`, `getpass` — from the standard library only, no ORM or web framework needed
 
 ---
@@ -61,7 +61,7 @@ password-manager-cli/
 │   ├── storage.py       # JSONStorage — atomic read/write
 │   ├── generator.py      # cryptographically secure password generation
 │   └── exceptions.py     # VaultError hierarchy
-├── tests/                 # 65 pytest tests, all using tmp_path
+├── tests/                 # 71 pytest tests, all using tmp_path
 ├── pyproject.toml
 └── requirements.txt
 ```
@@ -89,6 +89,7 @@ password-manager-cli/
 - Someone reading the vault file off disk without the master password (AES-128 via Fernet, HMAC-authenticated).
 - Casual shoulder-surfing (master password input uses `getpass`, never echoed; `list`/`repr` never print real passwords).
 - A crash or power loss mid-save corrupting the vault (atomic write).
+- A weak master password going unnoticed (`init` warns about short passwords or missing character types, though it can still be overridden).
 
 **What this does *not* protect against:**
 - A compromised machine (keyloggers, memory dumps while the vault is unlocked).
@@ -106,6 +107,5 @@ password-manager-cli/
 
 ## Limitations & Future work
 
-- No password strength meter for the master password.
 - No `change-master` command to re-encrypt an existing vault under a new password.
 - Single-vault, single-user design — no sharing or sync.
