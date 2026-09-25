@@ -1,7 +1,7 @@
-# 🔐 Password Manager CLI
+# Password Manager CLI
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![Tests](https://img.shields.io/badge/tests-64%20passing-brightgreen)
+![Tests](https://github.com/Sheyda-Fathi/password-manager-cli/actions/workflows/tests.yml/badge.svg)
 
 A secure command-line password manager that stores credentials **encrypted on disk**, protected by a single master password. Built as a learning project to practice production-grade Python: OOP, decorators, context managers, generators, custom exceptions, and real cryptography — no toy encryption.
 
