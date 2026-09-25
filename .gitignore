@@ -47,4 +47,6 @@ logs/
 *.vault
 *.vault.tmp
 vault.json
+*.vault.json
+test.json
 README.pdf 
