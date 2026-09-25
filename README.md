@@ -27,8 +27,8 @@ Most "password manager" tutorials either skip encryption entirely or roll their 
 
 - **Python 3.11+**
 - [`cryptography`](https://cryptography.io/) — PBKDF2-HMAC-SHA256 key derivation + Fernet (AES-128-CBC + HMAC) encryption
-- `argparse` — CLI parsing
-- `pytest` — 64 tests, all vault/crypto/storage/CLI logic covered
+- `argparse`, `pyperclip` — CLI parsing
+- `pytest` — 65 tests, all vault/crypto/storage/CLI logic covered
 - `dataclasses`, `secrets`, `getpass` — from the standard library only, no ORM or web framework needed
 
 ---
@@ -40,6 +40,7 @@ git clone <repo-url> && cd password-manager-cli
 python -m venv venv && venv\Scripts\activate   # or: source venv/bin/activate on macOS/Linux
 pip install -e ".[dev]"
 pwm init
+pwm get <site> --copy
 ```
 
 Then try `pwm add <site>`, `pwm list`, `pwm get <site> --show`, `pwm update <site>`, `pwm delete <site>`, or `pwm generate --length 24`.
@@ -60,7 +61,7 @@ password-manager-cli/
 │   ├── storage.py       # JSONStorage — atomic read/write
 │   ├── generator.py      # cryptographically secure password generation
 │   └── exceptions.py     # VaultError hierarchy
-├── tests/                 # 64 pytest tests, all using tmp_path
+├── tests/                 # 65 pytest tests, all using tmp_path
 ├── pyproject.toml
 └── requirements.txt
 ```
@@ -106,6 +107,5 @@ password-manager-cli/
 ## Limitations & Future work
 
 - No password strength meter for the master password.
-- No clipboard copy (`generate` prints to stdout only).
 - No `change-master` command to re-encrypt an existing vault under a new password.
 - Single-vault, single-user design — no sharing or sync.
