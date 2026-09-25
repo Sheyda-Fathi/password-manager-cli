@@ -69,6 +69,11 @@ def test_get_show_flag():
     args = parser.parse_args(["get", "github", "--show"])
     assert args.show is True
 
+def test_get_copy_flag():
+    """`get github --copy` should set copy to True"""
+    parser = build_parser()
+    args = parser.parse_args(["get", "github", "--copy"])
+    assert args.copy is True
 
 def test_generate_length_option():
     """`generate --length 24` should set length to 24"""

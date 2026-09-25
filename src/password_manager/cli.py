@@ -1,6 +1,7 @@
 """Command-line interface for the password manager"""
 
 import argparse
+import pyperclip
 import getpass
 import sys
 from pathlib import Path
@@ -88,7 +89,15 @@ def cmd_get(args: argparse.Namespace) -> int:
 
     with Vault.open(path, password) as vault:
         entry = vault.get(args.site)
-        shown = entry.password if args.show else "****"
+        if args.copy:
+            pyperclip.copy(entry.password)
+        if args.show:
+            shown = entry.password
+        elif args.copy:
+            shown = "**** (copied to clipboard)"
+        else:
+            shown = "****"
+            
         print(f"Site:     {entry.site}")
         print(f"Username: {entry.username}")
         print(f"Password: {shown}")
@@ -193,6 +202,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_get = sub.add_parser("get", help="Show one entry")
     p_get.add_argument("site")
     p_get.add_argument("--show", action="store_true", help="Show the real password")
+    p_get.add_argument("--copy",action="store_true",help="Copy the password to the clipboard instead of printing it")
     p_get.set_defaults(func=cmd_get)
 
     p_list = sub.add_parser("list", help="List every site")
